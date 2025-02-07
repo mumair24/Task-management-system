@@ -91,6 +91,41 @@ export class UserService {
     }
   }
 
+  async getUserById(req_user: any, id: string): Promise<EUser> {
+    try {
+      if (!id) {
+        throw new BadRequestException('Invalid user ID');
+      }
+
+      if (req_user.role !== 'admin' && req_user.id !== id) {
+        throw new ForbiddenException('Not allowed to get user');
+      }
+
+      const user = await this.repository.findOne({ where: { id: id } });
+
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      return user!;
+    } catch (error) {
+      console.error('Error fetching user:', error);
+
+      if (
+        error instanceof ForbiddenException ||
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'An error occurred while fetching the user',
+      );
+    }
+
+  }
+
   async updateUser(
     id: string,
     userDto: UserDto,

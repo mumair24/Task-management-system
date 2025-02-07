@@ -25,6 +25,13 @@ export class UserController {
     return await this.userService.getAllUsers(req.user);
   }
 
+  @Get(":id")
+  @UseGuards(ValidAuthGuard)
+  @ApiOperation({ summary: 'Get Users by ID' })
+  async getTaskById(@Req() req: any, @Param("id") id: string) {
+    return this.userService.getUserById(req.user, id);
+  }
+
   @Patch(':id')
   @UseGuards(ValidAuthGuard)
   @ApiOperation({ summary: 'Update a User' })
